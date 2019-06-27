@@ -26,7 +26,7 @@ layui.define(['jquery', 'layer', 'form', 'upload', 'laytpl', 'util'], function (
         layer.open({
             type: 1,
             title: '选择文件',
-            content: 'fileChoose.html?multi=true',
+            content: getHtml(),
             area: ['600px', '420px'],
             offset: '50px',
             shade: .1,
@@ -35,7 +35,6 @@ layui.define(['jquery', 'layer', 'form', 'upload', 'laytpl', 'util'], function (
                 init();
             }
         });
-
 
         // 渲染文件列表
         function renderList(dir) {
@@ -48,15 +47,32 @@ layui.define(['jquery', 'layer', 'form', 'upload', 'laytpl', 'util'], function (
             }, function (res) {
                 layer.closeAll('loading');
                 if (res.code == 200) {
-                    for (var i = 0; i < res.data.length; i++) {
-                        res.data[i].url = fileServer + 'file/' + res.data[i].url;
-                        res.data[i].smUrl = fileServer + 'file/' + res.data[i].smUrl;
+                    var html = '';
+                    if (res.data.length <= 0) {
+                        html += '<div class="file-choose-empty">';
+                        html += '   <i class="layui-icon layui-icon-face-surprised"></i>';
+                        html += '   <p>没有文件</p>';
+                        html += '</div>';
+                    } else {
+                        for (var i = 0; i < res.data.length; i++) {
+                            res.data[i].url = fileServer + 'file/' + res.data[i].url;
+                            res.data[i].smUrl = fileServer + 'file/' + res.data[i].smUrl;
+                            var item = res.data[i];
+                            html += '<div class="file-choose-list-item" data-index="' + i + '">';
+                            var url = item.hasSm ? item.smUrl : ('assets/images/fti/' + item.type + '.png');
+                            html += '   <div class="file-choose-list-item-img' + item.hasSm ? '' : ' img-icon' + '" style="background-image: url(\'' + url + '\')"></div>';
+                            html += '   <div class="file-choose-list-item-name">' + item.name + '</div>';
+                            if (!item.isDir && multi == 'true') {
+                                html += '   <div class="file-choose-list-item-ck layui-form">';
+                                html += '       <input type="checkbox" lay-skin="primary" lay-filter="file-choose-item-ck"/>';
+                                html += '   </div>';
+                            }
+                            html += '</div>';
+                        }
                     }
-                    laytpl($('#fc-file-item-tpl').html()).render(res.data, function (html) {
-                        $('#fc-btn-ok-sel').text('完成选择');
-                        $('.fc-file-list-group').html(html);
-                        form.render('checkbox');
-                    });
+                    $('#fc-btn-ok-sel').text('完成选择');
+                    $('#file-choose-list').html(html);
+                    form.render('checkbox');
                 } else {
                     layer.msg(res.msg, {icon: 2});
                 }
@@ -217,7 +233,125 @@ layui.define(['jquery', 'layer', 'form', 'upload', 'laytpl', 'util'], function (
 
     // 获取页面html
     function getHtml() {
+        var html = '';
+        // 样式
+        html += '<style>';
+        html += '.file-choose {';
+        html += '   position: relative;';
+        html += '   background: #fff;';
+        html += '   height: 100%;';
+        html += '}';
 
+        html += '.file-choose-top-bar {';
+        html += '   position: relative;';
+        html += '}';
+
+        html += '.file-choose-top-text {';
+        html += '   padding: 12px;';
+        html += '}';
+
+        html += '.file-choose-top-btn-group {';
+        html += '   position: absolute;';
+        html += '   right: 12px;';
+        html += '   top: 5px;';
+        html += '}';
+
+        html += '.file-choose-list {';
+        html += '   position: absolute;';
+        html += '   top: 40px;';
+        html += '   bottom: 48px;';
+        html += '   left: 0;';
+        html += '   right: 0;';
+        html += '   overflow: auto;';
+        html += '   padding: 0 8px;';
+        html += '}';
+
+        html += '.file-choose-bottom-bar {';
+        html += '   position: absolute;';
+        html += '   left: 0;';
+        html += '   right: 0;';
+        html += '   bottom: 0;';
+        html += '   border-top: 1px solid #eee;';
+        html += '   padding: 8px 12px;';
+        html += '   text-align: right;';
+        html += '}';
+
+        html += '.file-choose-list-item {';
+        html += '   position: relative;';
+        html += '   display: inline-block;';
+        html += '   vertical-align: top;';
+        html += '   padding: 15px 8px;';
+        html += '}';
+
+        html += '.file-choose-list-item-img {';
+        html += '   width: 90px;';
+        html += '   height: 90px;';
+        html += '   background-repeat: no-repeat;';
+        html += '   background-position: center;';
+        html += '   background-size: cover;';
+        html += '   border-radius: 3px;';
+        html += '   overflow: hidden;';
+        html += '   position: relative;';
+        html += '}';
+
+        html += '.file-choose-list-item-img.img-icon {';
+        html += '   background-size: inherit;';
+        html += '}';
+
+        html += '.file-choose-list-item-img.active:after {';
+        html += '   content: "";';
+        html += '   position: absolute;';
+        html += '   left: 0;';
+        html += '   top: 0;';
+        html += '   bottom: 0;';
+        html += '   right: 0;';
+        html += '   background: rgba(0, 0, 0, 0.3);';
+        html += '}';
+
+        html += '.file-choose-list-item-name {';
+        html += '   width: 90px;';
+        html += '   overflow: hidden;';
+        html += '   text-overflow: ellipsis;';
+        html += '   white-space: nowrap;';
+        html += '   color: #333;';
+        html += '   font-size: 12px;';
+        html += '   text-align: center;';
+        html += '   margin-top: 12px;';
+        html += '}';
+
+        html += '.file-choose-list-item-ck {';
+        html += '   position: absolute;';
+        html += '   right: 8px;';
+        html += '   top: 15px;';
+        html += '}';
+
+        html += '.file-choose-list-item-ck .layui-form-checkbox {';
+        html += '   padding: 0;';
+        html += '}';
+        html += '</style>';
+        // html
+        html += '<div class="file-choose">';
+        html += '    <div class="file-choose-top-bar">';
+        html += '        <div class="file-choose-top-text">当前位置：<span id="fc-current-position">/</span></div>';
+        html += '        <div class="file-choose-top-btn-group">';
+        html += '            <button id="fc-btn-back" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">';
+        html += '                <i class="layui-icon">&#xe65c;</i>上级';
+        html += '            </button>';
+        html += '            <button id="fc-btn-refresh" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">';
+        html += '                <i class="layui-icon">&#xe669;</i>刷新';
+        html += '            </button>';
+        html += '            <button id="fc-btn-upload" class="layui-btn layui-btn-sm icon-btn" style="margin-right: 0;">';
+        html += '                <i class="layui-icon">&#xe681;</i>上传';
+        html += '            </button>';
+        html += '        </div>';
+        html += '    </div>';
+        html += '    <div id="file-choose-list" class="file-choose-list"></div>';
+        html += '    <div class="file-choose-bottom-bar">';
+        html += '        <button id="fc-btn-ok-sel" class="layui-btn layui-btn-sm layui-btn-normal icon-btn">完成选择</button>';
+        html += '    </div>';
+        html += '</div>';
+
+        return html;
     }
 
     exports("fileChoose", fileChoose);

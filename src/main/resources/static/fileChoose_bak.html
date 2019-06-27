@@ -1,133 +1,71 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>EasyFS文件服务器</title>
     <link rel="stylesheet" href="assets/layui/css/layui.css">
+    <link rel="stylesheet" href="assets/common.css">
     <style>
         html, body {
-            height: 100%;
-            overflow: hidden;
+            background: white;
         }
 
-        .file-choose {
-            position: relative;
-            background: #fff;
-            height: 100%;
-        }
-
-        .file-choose-top-bar {
-            position: relative;
-        }
-
-        .file-choose-top-text {
-            padding: 12px;
-        }
-
-        .file-choose-top-btn-group {
-            position: absolute;
-            right: 12px;
-            top: 5px;
-        }
-
-        .file-choose-list {
-            position: absolute;
-            top: 40px;
-            bottom: 48px;
-            left: 0;
-            right: 0;
-            overflow: auto;
-            padding: 0 8px;
-        }
-
-        .file-choose-bottom-bar {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-top: 1px solid #eee;
-            padding: 8px 12px;
+        .fc-tool-btn-group {
             text-align: right;
         }
 
-        .file-choose-list-item {
-            position: relative;
-            display: inline-block;
-            vertical-align: top;
-            padding: 15px 8px;
+        @media screen and (max-width: 420px) {
+            .fc-tool-btn-group {
+                padding-top: 30px;
+                text-align: left;
+            }
         }
 
-        .file-choose-list-item-img {
-            width: 90px;
-            height: 90px;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: cover;
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .file-choose-list-item-img.img-icon {
-            background-size: inherit;
-        }
-
-        .file-choose-list-item-img.active:after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
+        .fc-bottom-group {
+            position: fixed;
             bottom: 0;
+            left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            text-align: right;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            border-top: 1px solid #e6e6e6;
         }
 
-        .file-choose-list-item-name {
-            width: 90px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: #333;
-            font-size: 12px;
-            text-align: center;
-            margin-top: 12px;
+        .fc-bottom-show-block {
+            padding-bottom: 50px;
         }
 
-        .file-choose-list-item-ck {
-            position: absolute;
-            right: 8px;
-            top: 15px;
+        .fc-bottom-show-block .fc-bottom-group {
+            display: block;
         }
-
-        .file-choose-list-item-ck .layui-form-checkbox {
-            padding: 0;
-        }
-
-
     </style>
 </head>
+
 <body>
 
-<div class="file-choose">
-    <div class="file-choose-top-bar">
-        <div class="file-choose-top-text">当前位置：<span id="fc-current-position">/</span></div>
-        <div class="file-choose-top-btn-group">
-            <button id="fc-btn-back" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">
-                <i class="layui-icon">&#xe65c;</i>上级
-            </button>
-            <button id="fc-btn-refresh" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">
-                <i class="layui-icon">&#xe669;</i>刷新
-            </button>
-            <button id="fc-btn-upload" class="layui-btn layui-btn-sm icon-btn" style="margin-right: 0;">
-                <i class="layui-icon">&#xe681;</i>上传
-            </button>
-        </div>
+<div style="padding: 15px;">
+    <div style="position: absolute;left: 15px;">当前位置：<span id="fc-current-position">/</span></div>
+    <div class="fc-tool-btn-group">
+        <button id="fc-btn-back" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">
+            <i class="layui-icon">&#xe65c;</i>上级
+        </button>
+        <button id="fc-btn-refresh" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">
+            <i class="layui-icon">&#xe669;</i>刷新
+        </button>
+        <button id="fc-btn-upload" class="layui-btn layui-btn-sm layui-btn-normal icon-btn" style="margin-right: 0;">
+            <i class="layui-icon">&#xe681;</i>上传
+        </button>
     </div>
-    <div class="file-choose-list">
+
+    <div class="fc-file-list-group">
     </div>
-    <div class="file-choose-bottom-bar">
+
+    <div class="fc-bottom-group">
         <button id="fc-btn-ok-sel" class="layui-btn layui-btn-sm layui-btn-normal icon-btn">完成选择</button>
     </div>
 </div>
@@ -142,26 +80,28 @@
 </div>
 
 <!-- 渲染模板 -->
-<script id="file-choose-tpl" type="text/html">
+<script id="fc-file-item-tpl" type="text/html">
     {{#  layui.each(d, function(index, item){ }}
-    <div class="file-choose-list-item" data-index="{{index}}">
-        {{# var url; if(item.hasSm){ url = item.smUrl; }}
-        {{# }else{ url='assets/images/fti/'+item.type+'.png'; }}
-        {{# } }}
-        <div class="file-choose-list-item-img {{item.hasSm?'':'img-icon'}}" style="background-image: url('{{url}}')">
+    <div class="fc-file-list-group-item" data-dir="{{item.isDir}}" data-url="{{item.url}}" data-name="{{item.name}}">
+        <div class="fc-file-list-group-img {{item.hasSm?'media':''}}">
+            {{# if(item.hasSm){ }}
+            <img src="{{item.smUrl}}"/>
+            {{# }else{ }}
+            <img src="assets/images/fti/{{item.type}}.png"/>
+            {{# } }}
         </div>
-        <div class="file-choose-list-item-name">{{item.name}}</div>
+        <div class="fc-file-list-group-name">{{item.name}}</div>
         {{# if(!item.isDir && multi=='true'){ }}
-        <div class="file-choose-list-item-ck layui-form">
-            <input type="checkbox" lay-skin="primary" lay-filter="file-choose-item-ck"/>
+        <div class="fc-file-list-group-ck layui-form">
+            <input type="checkbox" name="imgCk" lay-skin="primary" lay-filter="imgCk"/>
         </div>
         {{# } }}
     </div>
     {{#  }); }}
     {{# if(d.length<=0){ }}
-    <div class="file-choose-empty">
+    <div class="list-empty">
         <i class="layui-icon layui-icon-face-surprised"></i>
-        <p>没有文件</p>
+        <div>没有文件</div>
     </div>
     {{# } }}
 </script>
@@ -194,31 +134,30 @@
             if (!dir) {
                 dir = $('#fc-current-position').text();
             }
-            /*layer.load(2);
+            layer.load(2);
             $.get(baseServer + 'api/list', {
                 dir: dir,
                 accept: accept,
                 exts: exts
             }, function (res) {
-                layer.closeAll('loading');*/
-            var res = JSON.parse('{"msg":"查询成功","code":200,"data":[{"smUrl":"sm/2019/06/27/0065SLfTgy1fqfsyt020wj32801e0x6q.jpg","hasSm":true,"name":"0065SLfTgy1fqfsyt020wj32801e0x6q.jpg","updateTime":1561611464764,"type":"file","url":"2019/06/27/0065SLfTgy1fqfsyt020wj32801e0x6q.jpg","isDir":false},{"smUrl":"sm/2019/06/27/20160826152553_28b02a.jpg","hasSm":true,"name":"20160826152553_28b02a.jpg","updateTime":1561611468622,"type":"file","url":"2019/06/27/20160826152553_28b02a.jpg","isDir":false},{"name":"0.flv","updateTime":1561611474533,"type":"mp4","url":"2019/06/27/0.flv","isDir":false},{"smUrl":"sm/2019/06/27/a0e0bffa077b4218a0739433439521e2.jpg","hasSm":true,"name":"a0e0bffa077b4218a0739433439521e2.jpg","updateTime":1561611477739,"type":"file","url":"2019/06/27/a0e0bffa077b4218a0739433439521e2.jpg","isDir":false},{"smUrl":"sm/2019/06/27/background.bmp","hasSm":true,"name":"background.bmp","updateTime":1561611481103,"type":"file","url":"2019/06/27/background.bmp","isDir":false},{"smUrl":"sm/2019/06/27/emptybox.png","hasSm":true,"name":"emptybox.png","updateTime":1561611498346,"type":"file","url":"2019/06/27/emptybox.png","isDir":false},{"smUrl":"sm/2019/06/27/微信图片_20180423141141.jpg","hasSm":true,"name":"微信图片_20180423141141.jpg","updateTime":1561611507742,"type":"file","url":"2019/06/27/微信图片_20180423141141.jpg","isDir":false},{"smUrl":"sm/2019/06/27/微信图片_20180423141146.jpg","hasSm":true,"name":"微信图片_20180423141146.jpg","updateTime":1561611510935,"type":"file","url":"2019/06/27/微信图片_20180423141146.jpg","isDir":false},{"smUrl":"sm/2019/06/27/微信图片_20180423140343.jpg","hasSm":true,"name":"微信图片_20180423140343.jpg","updateTime":1561611517206,"type":"file","url":"2019/06/27/微信图片_20180423140343.jpg","isDir":false},{"name":"连接模拟器.bat","updateTime":1561611527228,"type":"file","url":"2019/06/27/连接模拟器.bat","isDir":false},{"name":"试题模板(一次最多可添加3000条)2019年06月21日 16时59分25秒.xls","updateTime":1561611551231,"type":"xls","url":"2019/06/27/试题模板(一次最多可添加3000条)2019年06月21日 16时59分25秒.xls","isDir":false},{"name":"常用命令.txt","updateTime":1561611565969,"type":"txt","url":"2019/06/27/常用命令.txt","isDir":false}]}')
-            if (res.code == 200) {
-                for (var i = 0; i < res.data.length; i++) {
-                    res.data[i].url = baseServer + 'file/' + res.data[i].url;
-                    res.data[i].smUrl = baseServer + 'file/' + res.data[i].smUrl;
+                layer.closeAll('loading');
+                if (res.code == 200) {
+                    for (var i = 0; i < res.data.length; i++) {
+                        res.data[i].url = baseServer + 'file/' + res.data[i].url;
+                        res.data[i].smUrl = baseServer + 'file/' + res.data[i].smUrl;
+                    }
+                    laytpl($('#fc-file-item-tpl').html()).render(res.data, function (html) {
+                        $('#fc-btn-ok-sel').text('完成选择');
+                        $('.fc-file-list-group').html(html);
+                        form.render('checkbox');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
                 }
-                laytpl($('#file-choose-tpl').html()).render(res.data, function (html) {
-                    $('#fc-btn-ok-sel').text('完成选择');
-                    $('.file-choose-list').html(html);
-                    form.render('checkbox');
-                });
-            } else {
-                layer.msg(res.msg, {icon: 2});
-            }
-            /*});*/
+            });
         }
 
-        renderList('/2019/06/27');
+        renderList();
 
         // 上传文件事件
         var nExts;
@@ -349,8 +288,8 @@
         });
 
         // 监听复选框选中
-        form.on('checkbox(file-choose-item-ck)', function (data) {
-            var ckSize = $('input[lay-filter="file-choose-item-ck"]:checked').length;
+        form.on('checkbox(imgCk)', function (data) {
+            var ckSize = $('input[name="imgCk"]:checked').length;
             if (data.elem.checked) {
                 if (maxNum && parseInt(maxNum) > 1 && ckSize > maxNum) {
                     layer.msg('最多只能选择' + maxNum + '个', {icon: 2});
