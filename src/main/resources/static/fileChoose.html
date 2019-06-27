@@ -13,18 +13,18 @@
             background: white;
         }
 
-        .btnDiv {
+        .fc-tool-btn-group {
             text-align: right;
         }
 
         @media screen and (max-width: 420px) {
-            .btnDiv {
+            .fc-tool-btn-group {
                 padding-top: 30px;
                 text-align: left;
             }
         }
 
-        .bottomBar {
+        .fc-bottom-group {
             position: fixed;
             bottom: 0;
             left: 0;
@@ -36,11 +36,11 @@
             border-top: 1px solid #e6e6e6;
         }
 
-        .showBB {
+        .fc-bottom-show-block {
             padding-bottom: 50px;
         }
 
-        .showBB .bottomBar {
+        .fc-bottom-show-block .fc-bottom-group {
             display: block;
         }
     </style>
@@ -49,50 +49,50 @@
 <body>
 
 <div style="padding: 15px;">
-    <div style="position: absolute;left: 15px;">当前位置：<span id="tvFP">/</span></div>
-    <div class="btnDiv">
-        <button id="btnBack" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">
+    <div style="position: absolute;left: 15px;">当前位置：<span id="fc-current-position">/</span></div>
+    <div class="fc-tool-btn-group">
+        <button id="fc-btn-back" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">
             <i class="layui-icon">&#xe65c;</i>上级
         </button>
-        <button id="btnRefresh" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">
+        <button id="fc-btn-refresh" class="layui-btn layui-btn-sm layui-btn-primary icon-btn">
             <i class="layui-icon">&#xe669;</i>刷新
         </button>
-        <button id="btnUpload" class="layui-btn layui-btn-sm layui-btn-normal icon-btn" style="margin-right: 0;">
+        <button id="fc-btn-upload" class="layui-btn layui-btn-sm layui-btn-normal icon-btn" style="margin-right: 0;">
             <i class="layui-icon">&#xe681;</i>上传
         </button>
     </div>
 
-    <div class="file-list">
+    <div class="fc-file-list-group">
     </div>
 
-    <div class="bottomBar">
-        <button id="btnSel" class="layui-btn layui-btn-sm layui-btn-normal icon-btn">完成选择</button>
+    <div class="fc-bottom-group">
+        <button id="fc-btn-ok-sel" class="layui-btn layui-btn-sm layui-btn-normal icon-btn">完成选择</button>
     </div>
 </div>
 
 <!-- 下拉菜单 -->
-<div class="dropdown-menu dropdown-anchor-top-left" id="dropdownFile">
+<div class="dropdown-menu dropdown-anchor-top-left" id="fc-dropdown-choose">
     <div class="dropdown-anchor"></div>
     <ul>
-        <li><a id="open"><i class="layui-icon layui-icon-file"></i>&emsp;查看&emsp;</a></li>
-        <li><a id="sel"><i class="layui-icon layui-icon-release"></i>&emsp;选择&emsp;</a></li>
+        <li><a id="fc-dropdown-btn-open"><i class="layui-icon layui-icon-file"></i>&emsp;查看&emsp;</a></li>
+        <li><a id="fc-dropdown-btn-sel"><i class="layui-icon layui-icon-release"></i>&emsp;选择&emsp;</a></li>
     </ul>
 </div>
 
 <!-- 渲染模板 -->
-<script id="fileTpl" type="text/html">
+<script id="fc-file-item-tpl" type="text/html">
     {{#  layui.each(d, function(index, item){ }}
-    <div class="file-list-item" data-dir="{{item.isDir}}" data-url="{{item.url}}" data-name="{{item.name}}">
-        <div class="file-list-img {{item.hasSm?'media':''}}">
+    <div class="fc-file-list-group-item" data-dir="{{item.isDir}}" data-url="{{item.url}}" data-name="{{item.name}}">
+        <div class="fc-file-list-group-img {{item.hasSm?'media':''}}">
             {{# if(item.hasSm){ }}
             <img src="{{item.smUrl}}"/>
             {{# }else{ }}
             <img src="assets/images/fti/{{item.type}}.png"/>
             {{# } }}
         </div>
-        <div class="file-list-name">{{item.name}}</div>
+        <div class="fc-file-list-group-name">{{item.name}}</div>
         {{# if(!item.isDir && multi=='true'){ }}
-        <div class="file-list-ck layui-form">
+        <div class="fc-file-list-group-ck layui-form">
             <input type="checkbox" name="imgCk" lay-skin="primary" lay-filter="imgCk"/>
         </div>
         {{# } }}
@@ -126,13 +126,13 @@
             accept = 'file';
         }
         if (multi && multi == 'true') {
-            $('body').addClass('showBB');
+            $('body').addClass('fc-bottom-show-block');
         }
 
         // 渲染文件列表
         function renderList(dir) {
             if (!dir) {
-                dir = $('#tvFP').text();
+                dir = $('#fc-current-position').text();
             }
             layer.load(2);
             $.get(baseServer + 'api/list', {
@@ -146,9 +146,9 @@
                         res.data[i].url = baseServer + 'file/' + res.data[i].url;
                         res.data[i].smUrl = baseServer + 'file/' + res.data[i].smUrl;
                     }
-                    laytpl(fileTpl.innerHTML).render(res.data, function (html) {
-                        $('#btnSel').text('完成选择');
-                        $('.file-list').html(html);
+                    laytpl($('#fc-file-item-tpl').html()).render(res.data, function (html) {
+                        $('#fc-btn-ok-sel').text('完成选择');
+                        $('.fc-file-list-group').html(html);
                         form.render('checkbox');
                     });
                 } else {
@@ -165,7 +165,7 @@
             nExts = exts.replace(/,/g, "|");
         }
         upload.render({
-            elem: '#btnUpload',
+            elem: '#fc-btn-upload',
             url: baseServer + 'file/upload',
             choose: function (obj) {
                 layer.load(2);
@@ -176,7 +176,7 @@
                     layer.msg(res.msg, {icon: 2});
                 } else {
                     layer.msg(res.msg, {icon: 1});
-                    $('#tvFP').text(util.toDateString(new Date(), '/yyyy/MM/dd'));
+                    $('#fc-current-position').text(util.toDateString(new Date(), '/yyyy/MM/dd'));
                     renderList();
                 }
             },
@@ -189,29 +189,29 @@
         });
 
         // 刷新
-        $('#btnRefresh').click(function () {
+        $('#fc-btn-refresh').click(function () {
             renderList();
         });
 
         var mUrl;
         // 列表点击事件
-        $('body').on('click', '.file-list-item', function (e) {
+        $('body').on('click', '.fc-file-list-group-item', function (e) {
             var isDir = $(this).data('dir');
             var name = $(this).data('name');
             mUrl = $(this).data('url');
             $('#copy').attr('data-clipboard-text', mUrl);
             if (isDir) {
-                var cDir = $('#tvFP').text();
+                var cDir = $('#fc-current-position').text();
                 cDir += (cDir == '/' ? name : ('/' + name));
-                $('#tvFP').text(cDir);
+                $('#fc-current-position').text(cDir);
                 renderList(cDir);
             } else {
-                var $target = $(this).find('.file-list-img');
-                $('#dropdownFile').css({
+                var $target = $(this).find('.fc-file-list-group-img');
+                $('#fc-dropdown-choose').css({
                     'top': $target.offset().top + 90,
                     'left': $target.offset().left + 25
                 });
-                $('#dropdownFile').addClass('dropdown-opened');
+                $('#fc-dropdown-choose').addClass('dropdown-opened');
                 if (e !== void 0) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -220,8 +220,8 @@
         });
 
         // 返回上级
-        $('#btnBack').click(function () {
-            var cDir = $('#tvFP').text();
+        $('#fc-btn-back').click(function () {
+            var cDir = $('#fc-current-position').text();
             if (cDir == '/') {
                 // layer.msg('已经是根目录', {icon: 2})
             } else {
@@ -229,7 +229,7 @@
                 if (!cDir) {
                     cDir = '/';
                 }
-                $('#tvFP').text(cDir);
+                $('#fc-current-position').text(cDir);
                 renderList(cDir);
             }
         });
@@ -237,32 +237,32 @@
         // 点击空白隐藏下拉框
         $('html').off('click.dropdown').on('click.dropdown', function () {
             $('#copy').attr('data-clipboard-text', '');
-            $('#dropdownFile').removeClass('dropdown-opened');
+            $('#fc-dropdown-choose').removeClass('dropdown-opened');
         });
 
         // 打开
-        $('#open').click(function () {
-            window.open(mUrl);
+        $('#fc-dropdown-btn-open').click(function () {
+            window.fc - dropdown - btn - open(mUrl);
         });
         // 选择
-        $('#sel').click(function () {
+        $('#fc-dropdown-btn-sel').click(function () {
             if (!multi || multi == 'false') {
                 var urls = [];
                 urls.push(mUrl);
                 parent.mFsUrls = urls;
                 parent.layer.close(parent.layer.getFrameIndex(window.name));
             } else {
-                /*var $ck = $('.file-list-item[data-url="' + mUrl + '"] input[name="imgCk"]');
+                /*var $ck = $('.fc-file-list-group-item[data-url="' + mUrl + '"] input[name="imgCk"]');
                 $ck.prop('checked', !$ck.prop('checked'));
                 form.render('checkbox');
-                $ck.parents('.file-list-item').toggleClass('active');
-                $('#btnSel').text('完成选择(' + $('input[name="imgCk"]:checked').length + ')');*/
-                $('.file-list-item[data-url="' + mUrl + '"] .layui-form-checkbox').trigger('click');
+                $ck.parents('.fc-file-list-group-item').toggleClass('active');
+                $('#fc-btn-ok-sel').text('完成选择(' + $('input[name="imgCk"]:checked').length + ')');*/
+                $('.fc-file-list-group-item[data-url="' + mUrl + '"] .layui-form-checkbox').trigger('click');
             }
         });
 
         // 多选框事件
-        $('body').on('click', '.file-list-ck', function (e) {
+        $('body').on('click', '.fc-file-list-group-ck', function (e) {
             if (e !== void 0) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -270,10 +270,10 @@
         });
 
         // 完成选择按钮
-        $('#btnSel').click(function () {
+        $('#fc-btn-ok-sel').click(function () {
             var urls = [];
             $('input[name="imgCk"]:checked').each(function () {
-                urls.push($(this).parents('.file-list-item').data('url'));
+                urls.push($(this).parents('.fc-file-list-group-item').data('url'));
             });
             if (urls.length <= 0) {
                 layer.msg('请选择', {icon: 2});
@@ -297,11 +297,11 @@
                     form.render('checkbox');
                     return;
                 }
-                $(data.elem).parents('.file-list-item').addClass('active');
+                $(data.elem).parents('.fc-file-list-group-item').addClass('active');
             } else {
-                $(data.elem).parents('.file-list-item').removeClass('active');
+                $(data.elem).parents('.fc-file-list-group-item').removeClass('active');
             }
-            $('#btnSel').text('完成选择(' + ckSize + ')');
+            $('#fc-btn-ok-sel').text('完成选择(' + ckSize + ')');
         });
 
     });
