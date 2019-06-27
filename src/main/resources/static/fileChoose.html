@@ -105,6 +105,16 @@
             padding: 0;
         }
 
+        .file-choose-oper-menu {
+            background-color: #fff;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+
+        .file-choose-oper-menu-item {
+            color: #333;
+        }
 
     </style>
 </head>
@@ -156,6 +166,11 @@
             <input type="checkbox" lay-skin="primary" lay-filter="file-choose-item-ck"/>
         </div>
         {{# } }}
+        <div class="file-choose-oper-menu">
+            <div class="file-choose-oper-menu-item">选择</div>
+            <div class="file-choose-oper-menu-item">查看</div>
+            <div class="file-choose-oper-menu-item">删除</div>
+        </div>
     </div>
     {{#  }); }}
     {{# if(d.length<=0){ }}
