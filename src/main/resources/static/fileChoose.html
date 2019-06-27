@@ -57,6 +57,12 @@
             display: inline-block;
             vertical-align: top;
             padding: 15px 8px;
+            overflow: visible;
+            cursor: pointer;
+        }
+
+        .file-choose-list-item:hover {
+            background-color: #eee;
         }
 
         .file-choose-list-item-img {
@@ -108,17 +114,32 @@
         .file-choose-oper-menu {
             background-color: #fff;
             position: absolute;
-            right: 0;
-            bottom: 0;
-            border-radius: 3px;
-            box-shadow: 0px 1px 3px rgba(0, 0, 0, .1);
+            left: 8px;
+            top: 15px;
+            border-radius: 2px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, .15);
+            transition: all .3s;
+            overflow: hidden;
+            transform: scale(0);
+            transform-origin: left top;
+        }
+
+        .file-choose-oper-menu.file-choose-oper-menu-show {
+            transform: scale(1);
         }
 
         .file-choose-oper-menu-item {
-            color: #333;
-            padding: 5px 15px;
-            border-bottom: 1px solid #eee;
-            font-size: 13px;
+            color: #555;
+            padding: 8px 5px;
+            font-size: 14px;
+            min-width: 70px;
+            text-align: center;
+            cursor: pointer;
+            display: block;
+        }
+
+        .file-choose-oper-menu-item:hover {
+            background-color: #eee;
         }
 
     </style>
@@ -221,7 +242,7 @@
                 exts: exts
             }, function (res) {
                 layer.closeAll('loading');*/
-            var res = JSON.parse('{"msg":"查询成功","code":200,"data":[{"smUrl":"sm/2019/06/27/0065SLfTgy1fqfsyt020wj32801e0x6q.jpg","hasSm":true,"name":"0065SLfTgy1fqfsyt020wj32801e0x6q.jpg","updateTime":1561611464764,"type":"file","url":"2019/06/27/0065SLfTgy1fqfsyt020wj32801e0x6q.jpg","isDir":false},{"smUrl":"sm/2019/06/27/20160826152553_28b02a.jpg","hasSm":true,"name":"20160826152553_28b02a.jpg","updateTime":1561611468622,"type":"file","url":"2019/06/27/20160826152553_28b02a.jpg","isDir":false},{"name":"0.flv","updateTime":1561611474533,"type":"mp4","url":"2019/06/27/0.flv","isDir":false},{"smUrl":"sm/2019/06/27/a0e0bffa077b4218a0739433439521e2.jpg","hasSm":true,"name":"a0e0bffa077b4218a0739433439521e2.jpg","updateTime":1561611477739,"type":"file","url":"2019/06/27/a0e0bffa077b4218a0739433439521e2.jpg","isDir":false},{"smUrl":"sm/2019/06/27/background.bmp","hasSm":true,"name":"background.bmp","updateTime":1561611481103,"type":"file","url":"2019/06/27/background.bmp","isDir":false},{"smUrl":"sm/2019/06/27/emptybox.png","hasSm":true,"name":"emptybox.png","updateTime":1561611498346,"type":"file","url":"2019/06/27/emptybox.png","isDir":false},{"smUrl":"sm/2019/06/27/微信图片_20180423141141.jpg","hasSm":true,"name":"微信图片_20180423141141.jpg","updateTime":1561611507742,"type":"file","url":"2019/06/27/微信图片_20180423141141.jpg","isDir":false},{"smUrl":"sm/2019/06/27/微信图片_20180423141146.jpg","hasSm":true,"name":"微信图片_20180423141146.jpg","updateTime":1561611510935,"type":"file","url":"2019/06/27/微信图片_20180423141146.jpg","isDir":false},{"smUrl":"sm/2019/06/27/微信图片_20180423140343.jpg","hasSm":true,"name":"微信图片_20180423140343.jpg","updateTime":1561611517206,"type":"file","url":"2019/06/27/微信图片_20180423140343.jpg","isDir":false},{"name":"连接模拟器.bat","updateTime":1561611527228,"type":"file","url":"2019/06/27/连接模拟器.bat","isDir":false},{"name":"试题模板(一次最多可添加3000条)2019年06月21日 16时59分25秒.xls","updateTime":1561611551231,"type":"xls","url":"2019/06/27/试题模板(一次最多可添加3000条)2019年06月21日 16时59分25秒.xls","isDir":false},{"name":"常用命令.txt","updateTime":1561611565969,"type":"txt","url":"2019/06/27/常用命令.txt","isDir":false}]}')
+            var res = JSON.parse('{"msg":"查询成功","code":200,"data":[{"smUrl":"sm/2019/06/27/DIGITAL LIGHT.JPG","hasSm":true,"name":"0065SLfTgy1fqfsyt020wj32801e0x6q.jpg","updateTime":1561611464764,"type":"file","url":"2019/06/27/DIGITAL LIGHT.JPG","isDir":false},{"smUrl":"sm/2019/06/27/DIGITAL LIGHT.JPG","hasSm":true,"name":"20160826152553_28b02a.jpg","updateTime":1561611468622,"type":"file","url":"2019/06/27/DIGITAL LIGHT.JPG","isDir":false},{"name":"0.flv","updateTime":1561611474533,"type":"mp4","url":"2019/06/27/0.flv","isDir":false},{"smUrl":"sm/2019/06/27/DIGITAL LIGHT.JPG","hasSm":true,"name":"a0e0bffa077b4218a0739433439521e2.jpg","updateTime":1561611477739,"type":"file","url":"2019/06/27/DIGITAL LIGHT.JPG","isDir":false},{"smUrl":"sm/2019/06/27/DIGITAL LIGHT.JPG","hasSm":true,"name":"background.bmp","updateTime":1561611481103,"type":"file","url":"2019/06/27/DIGITAL LIGHT.JPG","isDir":false},{"smUrl":"sm/2019/06/27/DIGITAL LIGHT.JPG","hasSm":true,"name":"emptybox.png","updateTime":1561611498346,"type":"file","url":"2019/06/27/DIGITAL LIGHT.JPG","isDir":false},{"smUrl":"sm/2019/06/27/DIGITAL LIGHT.JPG","hasSm":true,"name":"微信图片_20180423141141.jpg","updateTime":1561611507742,"type":"file","url":"2019/06/27/DIGITAL LIGHT.JPG","isDir":false},{"smUrl":"sm/2019/06/27/DIGITAL LIGHT.JPG","hasSm":true,"name":"微信图片_20180423141146.jpg","updateTime":1561611510935,"type":"file","url":"2019/06/27/DIGITAL LIGHT.JPG","isDir":false},{"smUrl":"sm/2019/06/27/DIGITAL LIGHT.JPG","hasSm":true,"name":"微信图片_20180423140343.jpg","updateTime":1561611517206,"type":"file","url":"2019/06/27/DIGITAL LIGHT.JPG","isDir":false},{"name":"连接模拟器.bat","updateTime":1561611527228,"type":"file","url":"2019/06/27/连接模拟器.bat","isDir":false},{"name":"试题模板(一次最多可添加3000条)2019年06月21日 16时59分25秒.xls","updateTime":1561611551231,"type":"xls","url":"2019/06/27/试题模板(一次最多可添加3000条)2019年06月21日 16时59分25秒.xls","isDir":false},{"name":"常用命令.txt","updateTime":1561611565969,"type":"txt","url":"2019/06/27/常用命令.txt","isDir":false}]}')
             if (res.code == 200) {
                 for (var i = 0; i < res.data.length; i++) {
                     res.data[i].url = baseServer + 'file/' + res.data[i].url;
@@ -276,7 +297,8 @@
 
         var mUrl;
         // 列表点击事件
-        $('body').on('click', '.fc-file-list-group-item', function (e) {
+        $('body').on('click', '.file-choose-list-item', function (e) {
+            $(this).find('.file-choose-oper-menu').toggleClass('file-choose-oper-menu-show');
             var isDir = $(this).data('dir');
             var name = $(this).data('name');
             mUrl = $(this).data('url');
